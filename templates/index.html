@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>E7 Gear Evaluator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Epic Seven toolkit</p>
+        <h1>Gear evaluator</h1>
+        <p class="subtitle">Turn a gear screenshot into a clear rolling decision.</p>
+      </div>
+      <div class="spark">✦</div>
+    </header>
+
+    {% if error %}
+      <div class="alert" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <section class="grid">
+      <form class="panel input-panel" method="post" enctype="multipart/form-data">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Step 1</p>
+            <h2>Read your gear</h2>
+          </div>
+          <span class="badge">OCR</span>
+        </div>
+
+        <label class="dropzone" for="screenshot">
+          <span class="upload-icon">↑</span>
+          <strong>Choose a screenshot</strong>
+          <span>PNG, JPG, or BMP · up to 10 MB</span>
+          <input id="screenshot" name="screenshot" type="file" accept=".png,.jpg,.jpeg,.bmp">
+        </label>
+
+        <button class="button secondary" type="submit" name="action" value="ocr">
+          Extract text from screenshot
+        </button>
+
+        <label class="field-label" for="ocr_text">OCR text <span>Edit mistakes here</span></label>
+        <textarea id="ocr_text" name="ocr_text" placeholder="Example:
+Level 85
+Main Stat: Attack%
+Speed 5
+Critical Hit Chance 8%
+Attack 8%">{{ ocr_text }}</textarea>
+
+        <button class="button primary" type="submit" name="action" value="analyze">
+          Analyze gear <span>→</span>
+        </button>
+      </form>
+
+      <section class="panel result-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Step 2</p>
+            <h2>Your verdict</h2>
+          </div>
+          {% if evaluation %}
+            <span class="status {{ evaluation.recommendation|lower|replace(' ', '-') }}">
+              {{ evaluation.recommendation }}
+            </span>
+          {% endif %}
+        </div>
+
+        {% if evaluation %}
+          <div class="score-row">
+            <div class="score">{{ evaluation.score }}<small>/100</small></div>
+            <div>
+              <p class="score-label">Starting quality</p>
+              <div class="meter"><span style="width: {{ evaluation.score }}%"></span></div>
+            </div>
+          </div>
+          <div class="reasons">
+            <h3>Why?</h3>
+            {% for reason in evaluation.reasons %}
+              <p><span>✓</span>{{ reason }}</p>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">✦</div>
+            <h3>Your result will appear here</h3>
+            <p>Upload a screenshot, correct the OCR text if needed, then analyze.</p>
+          </div>
+        {% endif %}
+      </section>
+    </section>
+
+    <p class="disclaimer">General-purpose heuristic. Set, main stat, and hero-specific goals can change the decision.</p>
+  </main>
+</body>
+</html>
