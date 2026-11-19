@@ -18,6 +18,24 @@ class EvaluatorTests(unittest.TestCase):
         self.assertEqual(evaluation.recommendation, "Roll")
         self.assertGreaterEqual(evaluation.score, 65)
 
+    def test_game_screen_stat_layout_is_parsed(self):
+        gear = parse_gear(
+            "Health 540\n"
+            "Critical Hit Damage 7%\n"
+            "Defense 5%\n"
+            "Health 6%\n"
+            "Attack 8%"
+        )
+        self.assertEqual(
+            [(stat.name, stat.value) for stat in gear.substats],
+            [
+                ("critical hit damage", 7.0),
+                ("defense", 5.0),
+                ("health", 6.0),
+                ("attack", 8.0),
+            ],
+        )
+
     def test_missing_substats_are_explicit(self):
         evaluation = evaluate_gear(parse_gear("Level 85"))
         self.assertEqual(evaluation.recommendation, "Insufficient data")

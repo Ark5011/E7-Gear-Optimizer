@@ -7,7 +7,7 @@ import ctypes
 from ctypes import wintypes
 
 from mss import mss
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 GAME_WINDOW_TITLE = "Epic Seven"
@@ -58,7 +58,10 @@ class ScreenCapture:
 
 
 def fingerprint(image: Image.Image) -> str:
-    """Create a stable, low-cost fingerprint for meaningful screen changes."""
-    sample = image.convert("L")
-    sample.thumbnail((160, 100))
+    """Fingerprint the gear details panel while ignoring game animations."""
+    width, height = image.size
+    panel = image.crop((int(width * 0.62), int(height * 0.14), width, height))
+    sample = panel.convert("L").resize((96, 64), Image.Resampling.BILINEAR)
+    sample = sample.filter(ImageFilter.GaussianBlur(radius=1))
+    sample = sample.point(lambda pixel: (pixel // 16) * 16)
     return hashlib.sha256(sample.tobytes()).hexdigest()

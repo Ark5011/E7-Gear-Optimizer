@@ -27,4 +27,4 @@ def recognize_image_bytes(data: bytes) -> str:
 def _recognize(image: Image.Image) -> str:
     prepared = ImageOps.grayscale(image)
     prepared = prepared.point(lambda pixel: 255 if pixel > 150 else 0)
-    return pytesseract.image_to_string(prepared).strip()
+    return pytesseract.image_to_string(prepared, config="--psm 6").strip()
